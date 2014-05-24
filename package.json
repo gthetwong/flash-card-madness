@@ -1,0 +1,11 @@
+{
+  "name": "FlashCardMadness",
+  "version": "0.0.1",
+  "description": "simple server for building a simple Flash Card Application",
+  "main": "app.js",
+  "author": "Graham Wong",
+  "dependencies": {
+    "express": "~3.5.0",
+    "nodemon": "~1.0.19"
+  }
+}
