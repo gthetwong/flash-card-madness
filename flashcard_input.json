@@ -1,4 +1,4 @@
-{
+spanishData({
     "courses": "platos",
     "first course": "entrada",
     "main course": "plato principal",
@@ -50,4 +50,4 @@
     "It's on me.": "¡Te invito yo!",
     "I am a vegetarian": "Soy vegetariano/-na.",
     "what doesn't kill you will make you fat.": "lo que no mata engorda"
-}
+});
