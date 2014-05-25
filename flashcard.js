@@ -8,9 +8,6 @@ window.flashCardApp = {
   Views: {},
   Routers: {},
   start: function(){
-    this.router = new this.Routers.Main();
-    Backbone.history.start({ pushState: true });
-    console.log("this is running the pushState");
     $.ajax({
       type:'Get',
       url: 'flashcard_input.json',
@@ -19,12 +16,22 @@ window.flashCardApp = {
       contentType: 'application/json',
       dataType: 'jsonp',
       success: function(json) {
-        console.log(json,"this is the json");
+        flashCardApp.words = new flashCardApp.Collections.Wordset();
+        for (attr in json){
+              var word = new flashCardApp.Models.Word({
+                english : attr,
+                spanish : json[attr]
+              });
+              flashCardApp.words.add(word);
+            }
       },
       error: function(e) {
         console.log(e.message);
       }
     });
+    this.router = new this.Routers.Main();
+    Backbone.history.start({ pushState: true });
+    console.log("this is running the pushState");
   }
 };
 
@@ -38,20 +45,13 @@ $(function(){
 //      MODELS AND COLLECTIONS     //
 /////////////////////////////////////
 
-flashCardApp.Models.EnglishWord = Backbone.Model.extend({
-
+flashCardApp.Models.Word = Backbone.Model.extend({
+  english : "",
+  spanish : ""
 });
 
-flashCardApp.Models.SpanishWord = Backbone.Model.extend({
-
-});
-
-flashCardApp.Collections.SpanishWords = Backbone.Collection.extend({
-  model: flashCardApp.Models.SpanishWord
-});
-
-flashCardApp.Collections.EnglishWords = Backbone.Collection.extend({
-  model: flashCardApp.Models.EnglishWord
+flashCardApp.Collections.Wordset = Backbone.Collection.extend({
+  model: flashCardApp.Models.Word
 });
 
 /////////////////////////////////////
@@ -61,7 +61,10 @@ flashCardApp.Collections.EnglishWords = Backbone.Collection.extend({
 
 flashCardApp.Views.Home = Backbone.View.extend({
   render: function(){
-    this.$el.html("Hellooo Backbone World");
+    var that = this;
+    _.each(flashCardApp.words.models, function(card, index){
+      that.$el.append("<p> " +card.attributes.english + " translates to " + card.attributes.spanish+ "</p>");
+    });
     return this;
   }
 });
@@ -78,7 +81,6 @@ flashCardApp.Routers.Main = Backbone.Router.extend({
   },
   index: function(){
     var home = new flashCardApp.Views.Home();
-    
     $('#spa').html(home.render().$el);
   },
   alert: function(){
