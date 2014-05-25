@@ -63,8 +63,30 @@ flashCardApp.Views.Home = Backbone.View.extend({
   render: function(){
     var that = this;
     _.each(flashCardApp.words.models, function(card, index){
+      //passing in each card as a model to a new view
       that.$el.append("<p> " +card.attributes.english + " translates to " + card.attributes.spanish+ "</p>");
     });
+    return this;
+  }
+});
+
+flashCardApp.Views.Card = Backbone.View.extend({
+  render: function(){
+    this.$el.html("<div><h1>" + this.model.attributes.english + "</h1> </div>");
+    return this;
+  },
+  // display: function(){
+  //   $("#spa").append(this.render().$el);
+  // }
+});
+
+flashCardApp.Views.Tile = Backbone.View.extend({
+  render: function(){
+    var that = this;
+    this.collection.each(function(card){
+        var tile = new flashCardApp.Views.Card({ model:card });
+        this.$el.append(tile.render().$el);
+    }, this);
     return this;
   }
 });
@@ -80,8 +102,8 @@ flashCardApp.Routers.Main = Backbone.Router.extend({
     "alert": "alert"
   },
   index: function(){
-    var home = new flashCardApp.Views.Home();
-    $('#spa').html(home.render().$el);
+    var tileSet = new flashCardApp.Views.Tile({ collection: flashCardApp.words });
+    $("#spa").append(tileSet.render().$el);
   },
   alert: function(){
     alert("alerting you this works!");
