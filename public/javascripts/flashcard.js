@@ -10,7 +10,7 @@ window.flashCardApp = {
   start: function(){
     $.ajax({
       type:'Get',
-      url: 'flashcard_input.json',
+      url: '../flashcard_input.json',
       async: false,
       jsonpCallback: 'spanishData',
       contentType: 'application/json',
@@ -58,33 +58,41 @@ flashCardApp.Collections.Wordset = Backbone.Collection.extend({
 //             THE VIEWS           //
 /////////////////////////////////////
 
-
-flashCardApp.Views.Home = Backbone.View.extend({
+flashCardApp.Views.Card = Backbone.View.extend({
+  className : "quizCard",
+  events: {
+    "click .answerBtn" : "showAnswer"
+  },
   render: function(){
-    var that = this;
-    _.each(flashCardApp.words.models, function(card, index){
-      //passing in each card as a model to a new view
-      that.$el.append("<p> " +card.attributes.english + " translates to " + card.attributes.spanish+ "</p>");
-    });
+    this.$el.html("<h2> Translate \"" + this.model.attributes.english + "\" to Spanish </h2><h4 class=\"answerBtn\">Show me the answer! </h4> <a class=\"closeBtn\" href=\"#\"></a>");
     return this;
+  },
+  showAnswer: function(){
+    $(".quizCard").append(this.model.attributes.spanish);
+  }
+})
+
+flashCardApp.Views.Tile = Backbone.View.extend({
+  className : "tile",
+  events: {
+    "click" : "quiz"
+  },
+  render: function(){
+    this.$el.html("<h3>" + this.model.attributes.english + "</h3>");
+    return this;
+  },
+  quiz: function(){
+    var flashCard = new flashCardApp.Views.Card({model: this.model});
+     $(".quizContainer").html(flashCard.render().$el);
   }
 });
 
-flashCardApp.Views.Card = Backbone.View.extend({
-  render: function(){
-    this.$el.html("<div><h1>" + this.model.attributes.english + "</h1> </div>");
-    return this;
-  },
-  // display: function(){
-  //   $("#spa").append(this.render().$el);
-  // }
-});
-
-flashCardApp.Views.Tile = Backbone.View.extend({
+flashCardApp.Views.TileSet = Backbone.View.extend({
+  className: "tileView",
   render: function(){
     var that = this;
     this.collection.each(function(card){
-        var tile = new flashCardApp.Views.Card({ model:card });
+        var tile = new flashCardApp.Views.Tile({ model:card });
         this.$el.append(tile.render().$el);
     }, this);
     return this;
@@ -99,13 +107,13 @@ flashCardApp.Views.Tile = Backbone.View.extend({
 flashCardApp.Routers.Main = Backbone.Router.extend({
   routes: {
     "": "index",
-    "alert": "alert"
+    "card/:english": "english"
   },
   index: function(){
-    var tileSet = new flashCardApp.Views.Tile({ collection: flashCardApp.words });
+    var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
     $("#spa").append(tileSet.render().$el);
   },
-  alert: function(){
+  english: function(){
     alert("alerting you this works!");
     $('#spa').html("this is the alerter page");
   }
