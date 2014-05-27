@@ -58,21 +58,25 @@ flashCardApp.Collections.Wordset = Backbone.Collection.extend({
 //             THE VIEWS           //
 /////////////////////////////////////
 
-flashCardApp.Views.Card = Backbone.View.extend({
+flashCardApp.Views.EnglishCard = Backbone.View.extend({
   className : "quizCard",
   events: {
-    "click .answerBtn" : "showAnswer"
+    "click .answerBtn" : "showAnswer",
+    "click .closeBtn" : "closeWindow"
   },
   render: function(){
-    this.$el.html("<h2> Translate \"" + this.model.attributes.english + "\" to Spanish </h2><h4 class=\"answerBtn\">Show me the answer! </h4> <a class=\"closeBtn\" href=\"#\"></a>");
+    this.$el.html("<h2> Translate \"" + this.model.attributes.english + "\" to Spanish </h2><h4 class=\"answerBtn\">Show me the answer! </h4><div></div> <a class=\"closeBtn\" href=\"#\"></a>");
     return this;
   },
   showAnswer: function(){
-    $(".quizCard").append(this.model.attributes.spanish);
+    $(".quizCard div").html("<h3>" + this.model.attributes.spanish + "</h3>");
+  },
+  closeWindow: function(){
+    $(".quizContainer").html("");
   }
 })
 
-flashCardApp.Views.Tile = Backbone.View.extend({
+flashCardApp.Views.EnglishTile = Backbone.View.extend({
   className : "tile",
   events: {
     "click" : "quiz"
@@ -82,17 +86,19 @@ flashCardApp.Views.Tile = Backbone.View.extend({
     return this;
   },
   quiz: function(){
-    var flashCard = new flashCardApp.Views.Card({model: this.model});
+    var flashCard = new flashCardApp.Views.EnglishCard({model: this.model});
      $(".quizContainer").html(flashCard.render().$el);
+     flashCardApp.router.navigate("card/" + this.model.attributes.english, {trigger: true});
   }
 });
 
 flashCardApp.Views.TileSet = Backbone.View.extend({
+  el: "#spa",
   className: "tileView",
   render: function(){
     var that = this;
     this.collection.each(function(card){
-        var tile = new flashCardApp.Views.Tile({ model:card });
+        var tile = new flashCardApp.Views.EnglishTile({ model:card });
         this.$el.append(tile.render().$el);
     }, this);
     return this;
@@ -107,14 +113,19 @@ flashCardApp.Views.TileSet = Backbone.View.extend({
 flashCardApp.Routers.Main = Backbone.Router.extend({
   routes: {
     "": "index",
-    "card/:english": "english"
+    "card/:english": "english",
   },
   index: function(){
     var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
-    $("#spa").append(tileSet.render().$el);
+    tileSet.render();
   },
-  english: function(){
-    alert("alerting you this works!");
-    $('#spa').html("this is the alerter page");
+  english: function(english){
+    var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
+    tileSet.render();
+    var currentCard = flashCardApp.words.where({english: english});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard[0]});
+    $(".quizContainer").html(currentCardView.render().$el);
+    //reconstruct what happens when it goes to the english flash card w/out answer
+    //then build another route for what happens when its answered
   }
 });

@@ -1,3 +1,30 @@
+@font-face{
+  font-family: "ostrich";
+  src: url("ostrich-regular.ttf");
+  font-style: normal;
+  font-weight: normal;
+}
+@font-face{
+  font-family: "ostrichBold";
+  src: url("ostrich-bold.ttf");
+  font-style: normal;
+  font-weight: bold;
+}
+
+body{
+  background: #2C3E50;
+  font-family: "ostrich";
+  font-size:15pt;
+  color:#E87E04;
+}
+
+h1 {
+  font-family: "ostrichBold";
+  font-size:3em;
+  width:40%;
+  margin: auto;
+}
+
 .tile{
   width:125px;
   height:125px;
