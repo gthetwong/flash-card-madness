@@ -96,11 +96,10 @@ flashCardApp.Views.EnglishTile = Backbone.View.extend({
     return this;
   },
   quiz: function(){
-    console.log(this.model);
     var flashCard = new flashCardApp.Views.EnglishCard({model: this.model});
-     $(".quizContainer").html(flashCard.render().$el);
-     flashCardApp.router.navigate("card/" + this.model.cid + "/english");
-     return this;
+    $(".quizContainer").html(flashCard.render().$el);
+    flashCardApp.router.navigate("card/" + this.model.cid + "/english");
+    return this;
   }
 });
 
@@ -128,7 +127,6 @@ flashCardApp.Views.TileSet = Backbone.View.extend({
     var randomWord= flashCardApp.words.at(Math.floor(Math.random()*flashCardApp.words.length));
     var flashCard = new flashCardApp.Views.EnglishCard({model: randomWord});    
     $(".quizContainer").html(flashCard.render().$el);
-    console.log(randomWord);
     flashCardApp.router.navigate("blitz/"+ randomWord.cid);
     return this;
   }
@@ -158,8 +156,6 @@ flashCardApp.Routers.Main = Backbone.Router.extend({
     var currentCard = flashCardApp.words.get({ cid: id});
     var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard});
     $(".quizContainer").html(currentCardView.render().$el);
-    //reconstruct what happens when it goes to the english flash card w/out answer
-    //then build another route for what happens when its answered
   },
   englishAnswer: function(id){
     $("#spa").html("");
