@@ -8,17 +8,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.logger('dev'));
 // app.use(express.bodyParser());
 
-app.get('/', function(req, res){
+app.get('/*', function(req, res){
   res.sendfile('./public/views/index.html');
 });
 
-app.get('/card/:option/', function(req, res){
-  res.sendfile('./public/views/index.html');
-});
-
-app.get('/card/:option/:option2', function(req, res){
-  res.sendfile('./public/views/index.html');
-});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
