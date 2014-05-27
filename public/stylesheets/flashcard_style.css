@@ -15,7 +15,7 @@
 body{
   background: #554236;
   font-family: "ostrich";
-  font-size:20px;
+  font-size:24px;
   color:#554236;
 }
 
@@ -28,13 +28,14 @@ h1 {
 }
 
 .tile{
-  width:125px;
-  height:125px;
+  width:200px;
+  height:200px;
   margin:20px;
-  border: 5px solid #D3CE3D;
+  border: 10px solid #D3CE3D;
   background: #60B99A;
   float:left;
 }
+
 .tile h3{
   width: 100px;
   margin: 15px auto;
@@ -78,6 +79,8 @@ h1 {
  right: 10px;
  height:25px;
  width:25px;
+ background: none;
+ border: none;
  background-image: url("../images/Close-128.png");
  background-size: cover;
 }
@@ -92,4 +95,5 @@ h1 {
   font-size:36px;
   text-decoration: none;
   padding:10px;
+  border:none;
 }

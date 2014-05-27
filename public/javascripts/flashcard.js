@@ -65,20 +65,26 @@ flashCardApp.Views.EnglishCard = Backbone.View.extend({
     "click .closeBtn" : "closeWindow"
   },
   render: function(){
-    this.$el.html("<h2> Translate : <br>  <span>\"" + this.model.attributes.english + "\"</span></h2> <h2 class=\"answerBtn\">Show me the answer ! </h2><div></div> <a class=\"closeBtn\" href=\"#\"></a>");
+    this.$el.html("<h2> Translate : <br>  <span>\"" + this.model.attributes.english + "\"</span></h2> <h2 class=\"answerBtn\">Show me the answer ! </h2><div></div> <button class=\"closeBtn\"></button>");
     return this;
   },
   showAnswer: function(){
     $(".quizCard div").html("<h2> <span>" + this.model.attributes.spanish + "</span></h2>");
-    flashCardApp.router.navigate("card/" + this.model.attributes.english + "/" + this.model.attributes.spanish);
+    var query = window.location.hash;
+    if (query.indexOf("card")> -1){
+    flashCardApp.router.navigate("card/" + this.model.cid + "/english/answer");
+    }else {
+      flashCardApp.router.navigate("blitz/" + this.model.cid + "/english/answer");
+    }
     return this;
   },
-  closeWindow: function(){
+  closeWindow: function(event){
+    event.preventDefault();
     $(".quizContainer").html("");
-    flashCardApp.router.navigate("/");
+    flashCardApp.router.navigate("/", {trigger:true});
     return this;
   }
-})
+});
 
 flashCardApp.Views.EnglishTile = Backbone.View.extend({
   className : "tile",
@@ -90,9 +96,10 @@ flashCardApp.Views.EnglishTile = Backbone.View.extend({
     return this;
   },
   quiz: function(){
+    console.log(this.model);
     var flashCard = new flashCardApp.Views.EnglishCard({model: this.model});
      $(".quizContainer").html(flashCard.render().$el);
-     flashCardApp.router.navigate("card/" + this.model.attributes.english);
+     flashCardApp.router.navigate("card/" + this.model.cid + "/english");
      return this;
   }
 });
@@ -104,7 +111,7 @@ flashCardApp.Views.TileSet = Backbone.View.extend({
     "click .blitzBtn": "quizView"
   },
   initialize: function(){
-    this.$el.append("<a href=\"#\" class=\"blitzBtn\"> Blitz Mode! </a>");
+    this.$el.append("<button class=\"blitzBtn\"> Random Mode! </button>");
     return this;
   },
   render: function(){
@@ -116,9 +123,14 @@ flashCardApp.Views.TileSet = Backbone.View.extend({
     return this;
   },
   quizView: function(){
-    // $("#spa").html("");
-    var random = flashCardApp.words.at(Math.floor(Math.random()*flashCardApp.words.length));
-    console.log(random);
+    $("#spa").html("");
+    this.initialize();
+    var randomWord= flashCardApp.words.at(Math.floor(Math.random()*flashCardApp.words.length));
+    var flashCard = new flashCardApp.Views.EnglishCard({model: randomWord});    
+    $(".quizContainer").html(flashCard.render().$el);
+    console.log(randomWord);
+    flashCardApp.router.navigate("blitz/"+ randomWord.cid);
+    return this;
   }
 });
 
@@ -130,31 +142,51 @@ flashCardApp.Views.TileSet = Backbone.View.extend({
 flashCardApp.Routers.Main = Backbone.Router.extend({
   routes: {
     "": "index",
-    "card/:english": "english",
-    "card/:english/:spanish" : "englishAnswer",
-    "blitz/:card_id" : "blitz"
+    "card/:id/english": "english",
+    "card/:id/english/answer" : "englishAnswer",
+    "blitz/:card_id" : "blitz",
+    "blitz/:card_id/english/answer": "blitzAnswer"
   },
   index: function(){
     var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
     tileSet.initialize().render();
   },
-  english: function(english){
+  english: function(id){
     $("#spa").html("");
     var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
     tileSet.initialize().render();
-    var currentCard = flashCardApp.words.where({english: english});
-    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard[0]});
+    var currentCard = flashCardApp.words.get({ cid: id});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard});
     $(".quizContainer").html(currentCardView.render().$el);
     //reconstruct what happens when it goes to the english flash card w/out answer
     //then build another route for what happens when its answered
   },
-  englishAnswer: function(english, spanish){
+  englishAnswer: function(id){
     $("#spa").html("");
     var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
     tileSet.initialize().render();
-    var currentCard = flashCardApp.words.where({english: english});
-    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard[0]});
+    var currentCard = flashCardApp.words.get({cid: id});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard});
+    $(".quizContainer").html(currentCardView.render().$el);
+    currentCardView.showAnswer();
+  },
+  blitz: function(card_id){
+    $("#spa").html("");
+    var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
+    tileSet.initialize();
+    var currentCard = flashCardApp.words.get({cid: card_id});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard});
+    $(".quizContainer").html(currentCardView.render().$el);
+  },
+  blitzAnswer: function(card_id){
+    $("#spa").html("");
+    var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
+    tileSet.initialize();
+    var currentCard = flashCardApp.words.get({cid: card_id});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard});
     $(".quizContainer").html(currentCardView.render().$el);
     currentCardView.showAnswer();
   }
+
+
 });
