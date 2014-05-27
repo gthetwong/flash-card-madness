@@ -30,8 +30,7 @@ window.flashCardApp = {
       }
     });
     this.router = new this.Routers.Main();
-    Backbone.history.start();
-    console.log("this is running the pushState");
+    Backbone.history.start(); //pushState option was causing errors with external links
   }
 };
 
@@ -97,9 +96,9 @@ flashCardApp.Views.EnglishTile = Backbone.View.extend({
   },
   quiz: function(){
     var flashCard = new flashCardApp.Views.EnglishCard({model: this.model});
-    $(".quizContainer").html(flashCard.render().$el);
-    flashCardApp.router.navigate("card/" + this.model.cid + "/english");
-    return this;
+     $(".quizContainer").html(flashCard.render().$el);
+     flashCardApp.router.navigate("card/" + this.model.cid + "/english");
+     return this;
   }
 });
 
