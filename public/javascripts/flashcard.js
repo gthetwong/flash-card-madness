@@ -30,7 +30,7 @@ window.flashCardApp = {
       }
     });
     this.router = new this.Routers.Main();
-    Backbone.history.start({ pushState: true });
+    Backbone.history.start();
     console.log("this is running the pushState");
   }
 };
@@ -70,9 +70,13 @@ flashCardApp.Views.EnglishCard = Backbone.View.extend({
   },
   showAnswer: function(){
     $(".quizCard div").html("<h3>" + this.model.attributes.spanish + "</h3>");
+    flashCardApp.router.navigate("card/" + this.model.attributes.english + "/" + this.model.attributes.spanish);
+    return this;
   },
   closeWindow: function(){
     $(".quizContainer").html("");
+    flashCardApp.router.navigate("", {trigger:true});
+    return this;
   }
 })
 
@@ -89,6 +93,7 @@ flashCardApp.Views.EnglishTile = Backbone.View.extend({
     var flashCard = new flashCardApp.Views.EnglishCard({model: this.model});
      $(".quizContainer").html(flashCard.render().$el);
      flashCardApp.router.navigate("card/" + this.model.attributes.english, {trigger: true});
+     return this;
   }
 });
 
@@ -114,6 +119,7 @@ flashCardApp.Routers.Main = Backbone.Router.extend({
   routes: {
     "": "index",
     "card/:english": "english",
+    "card/:english/:spanish" : "englishAnswer"
   },
   index: function(){
     var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
@@ -127,5 +133,13 @@ flashCardApp.Routers.Main = Backbone.Router.extend({
     $(".quizContainer").html(currentCardView.render().$el);
     //reconstruct what happens when it goes to the english flash card w/out answer
     //then build another route for what happens when its answered
+  },
+  englishAnswer: function(english, spanish){
+    var tileSet = new flashCardApp.Views.TileSet({ collection: flashCardApp.words });
+    tileSet.render();
+    var currentCard = flashCardApp.words.where({english: english});
+    var currentCardView = new flashCardApp.Views.EnglishCard({model: currentCard[0]});
+    $(".quizContainer").html(currentCardView.render().$el);
+    currentCardView.showAnswer();
   }
 });
